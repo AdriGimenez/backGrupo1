@@ -1,35 +1,19 @@
 from rest_framework import serializers
-from django.contrib.auth.models import User
-from .models import *
+from .models import pedido, detalle_pedido
 
-class UserSerializer(serializers.ModelSerializer):
-    class Meta(object):
-        model = User
-        fields = ['id', 'username', 'password', 'email']
+class DetallePedidoSerializer(serializers.ModelSerializer):
+    producto = serializers.CharField(source='producto.nombre')
 
-class ProductoSerializer(serializers.ModelSerializer):
     class Meta:
-        model = Producto
-        fields = '__all__'
-
+        model = detalle_pedido
+        fields = ('id', 'producto', 'cantidad', 'subtotal')
 
 class PedidoSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Pedido
-        fields = '__all__'
+    detalles_pedido = DetallePedidoSerializer(many=True, read_only=True)
+    cliente = serializers.CharField(source='cliente.username')
+    estado = serializers.CharField(source='estado.descripcion')
+    cupon = serializers.CharField(source='cupon.descripcion', allow_null=True)
 
-
-class Detalle_pedidoSerializer(serializers.ModelSerializer):
     class Meta:
-        model = Detalle_pedido
-        fields = '__all__'
-
-class ClienteSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Cliente
-        fields = '__all__'
-
-class CategoriaSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = categoria
-        fields='__all__'
+        model = pedido
+        fields = ('id', 'fecha', 'subtotal', 'igv', 'total', 'cliente', 'estado', 'cupon', 'detalles_pedido')

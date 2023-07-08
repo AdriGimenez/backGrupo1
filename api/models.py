@@ -1,7 +1,7 @@
 from django.db import models
 
 # Create your models here.
-class Cupon(models.Model):
+class cupon(models.Model):
     codigo = models.CharField(max_length=200)
     descripcion = models.CharField(max_length=2000)
     descuento = models.DecimalField(max_digits=10,decimal_places=2)
@@ -9,18 +9,18 @@ class Cupon(models.Model):
     def __str__(self):
         return self.codigo
 
-class Estado_pedido(models.Model):
-    descripcion = models.CharField(max_length=200, default="enCarrito")
+class estado_pedido(models.Model):
+    descripcion = models.CharField(max_length=200)
     def __str__(self):
         return self.descripcion
 
-class Categoria(models.Model):
+class categoria(models.Model):
     nombre = models.CharField(max_length=200)
     descripcion = models.CharField(max_length=2000)
     def __str__(self):
         return self.nombre
 
-class Cliente(models.Model):
+class cliente(models.Model):
     username = models.CharField(max_length=200)
     nombre = models.CharField(max_length=200)
     email = models.EmailField()
@@ -28,32 +28,30 @@ class Cliente(models.Model):
     def __str__(self):
         return self.username
 
-class Producto(models.Model):
+class producto(models.Model):
     nombre = models.CharField(max_length=200)
-    descripcion = models.CharField(max_length=200,  blank=True)
-    categoria = models.ForeignKey(Categoria, on_delete=models.CASCADE, blank=True, null=True)
-    igv = models.BooleanField(default=True, null=True)
-    imagen = models.FileField(blank=True, null=True)
+    descripcion = models.CharField(max_length=200)
+    categoria = models.ForeignKey(categoria, on_delete=models.CASCADE)
+    igv = models.BooleanField(default=True)
+    imagen = models.FileField()
     precio = models.DecimalField(max_digits=10,decimal_places=2)
     descuento = models.DecimalField(max_digits=10,decimal_places=2)
-    imagen1 = models.FileField(blank=True, null=True)
+    imagen1 = models.FileField()
     def __str__(self):
         return self.nombre
     
-class Pedido(models.Model):
+class pedido(models.Model):
     fecha = models.DateTimeField(auto_now_add=True)
-    subtotal = models.DecimalField(max_digits=10,decimal_places=2, default=0)
-    igv = models.DecimalField(max_digits=10,decimal_places=2, default=0)
-    total = models.DecimalField(max_digits=10,decimal_places=2, default=0)
-    cliente = models.ForeignKey(Cliente, on_delete=models.CASCADE)
-    estado = models.ForeignKey(Estado_pedido, on_delete=models.CASCADE)
-    cupon = models.ForeignKey(Cupon, on_delete=models.CASCADE, blank=True,null=True)
+    subtotal = models.DecimalField(max_digits=10,decimal_places=2)
+    igv = models.DecimalField(max_digits=10,decimal_places=2)
+    total = models.DecimalField(max_digits=10,decimal_places=2)
+    cliente = models.ForeignKey(cliente, on_delete=models.CASCADE)
+    estado = models.ForeignKey(estado_pedido, on_delete=models.CASCADE)
+    cupon = models.ForeignKey(cupon, on_delete=models.CASCADE, blank=True,
+        null=True)
 
-class Detalle_pedido(models.Model):
-    pedido = models.ForeignKey(Pedido, on_delete=models.CASCADE)
-    producto = models.ForeignKey(Producto,on_delete=models.CASCADE)
+class detalle_pedido(models.Model):
+    pedido = models.ForeignKey(pedido, on_delete=models.CASCADE)
+    producto = models.ForeignKey(producto,on_delete=models.CASCADE)
     cantidad = models.IntegerField()
     subtotal = models.DecimalField(max_digits=10,decimal_places=2)
-
-    def __str__(self):
-        return f"Pedido de {self.pedido.cliente.nombre}"
